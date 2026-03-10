@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>{{ title }}</h2>
+<h3>Play History</h3>
+
+{% if plays %}
+<table>
+    <thead>
+        <tr>
+            <th>Show ID</th>
+            <th>Show Date</th>
+            <th>Version</th>
+            <th>Play Order</th>
+            <th>Track Notes</th>
+            <th>Album of the Week</th>
+            <th>Year in Britpop</th>
+            <th>Show Notes</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for row in plays %}
+        <tr>
+            <td>{{ row.show.show_id }}</td>
+
+            <td>
+                {% if row.show.show_date %}
+                    {{ row.show.show_date|date:"d M Y" }}
+                {% else %}
+                    Unknown
+                {% endif %}
+            </td>
+
+            <td>{{ row.version }}</td>
+            <td>{{ row.play_order }}</td>
+            <td>{{ row.notes }}</td>
+
+            <td>
+                {% if row.show.album_of_the_week %}
+                    {{ row.show.album_of_the_week }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+
+            <td>
+                {% if row.show.year_in_britpop %}
+                    {{ row.show.year_in_britpop }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+
+            <td>
+                {% if row.show.notes %}
+                    {{ row.show.notes }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No play history found for this track.</p>
+{% endif %}
+
+{% endblock %}

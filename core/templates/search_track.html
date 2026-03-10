@@ -1,0 +1,82 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'your_app/style.css' %}">
+
+<a href="{% url 'home' %}" class="back-btn">← Back</a>
+
+<h2>Search Track</h2>
+
+<form method="get" id="track-form">
+    <input type="text" id="track-input" name="track" value="{{ query }}" autocomplete="off">
+    <button type="submit">Search</button>
+</form>
+
+<div id="track-suggestions" class="suggestions"></div>
+
+{% if track_results %}
+<h3>Matching Tracks</h3>
+<ul>
+    {% for track in track_results %}
+        <li>
+            <a href="#" onclick="selectTrack('{{ track.title }}')">
+                {{ track.title }} — {{ track.artist.name }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if tracklisting_results %}
+<h3>All Plays of "{{ query }}"</h3>
+
+<table>
+    <tr>
+        <th>Show ID</th>
+        <th>Play Order</th>
+        <th>Artist</th>
+        <th>Version</th>
+        <th>Notes</th>
+    </tr>
+
+    {% for t in tracklisting_results %}
+    <tr>
+        <td>{{ t.show_id }}</td>
+        <td>{{ t.play_order }}</td>
+        <td>{{ t.artist }}</td>
+        <td>{{ t.version }}</td>
+        <td>{{ t.notes }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<script>
+function selectTrack(name) {
+    document.getElementById("track-input").value = name;
+    document.getElementById("track-form").submit();
+}
+
+document.getElementById("track-input").addEventListener("input", function () {
+    const term = this.value;
+    if (term.length < 2) {
+        document.getElementById("track-suggestions").innerHTML = "";
+        return;
+    }
+
+    fetch(`/autocomplete/track/?term=${term}`)
+        .then(response => response.json())
+        .then(data => {
+            const box = document.getElementById("track-suggestions");
+            box.innerHTML = "";
+            data.forEach(item => {
+                const div = document.createElement("div");
+                div.textContent = item;
+                div.onclick = () => {
+                    document.getElementById("track-input").value = item;
+                    box.innerHTML = "";
+                    document.getElementById("track-form").submit();
+                };
+                box.appendChild(div);
+            });
+        });
+});
+</script>

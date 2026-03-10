@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block content %}
+<button type="button" id="editModeBtn">Edit Existing Track</button>
+
+<div id="editSelector" style="display:none; margin-top:10px;">
+    <label>Select Track to Edit:</label>
+    <select id="trackSelect">
+        <option value="">-- choose a track --</option>
+        {% for t in tracks %}
+            <option value="{{ t.track_id }}">
+                {{ t.track_id }} — {{ t.artist }} – {{ t.title }}
+            </option>
+        {% endfor %}
+    </select>
+</div>
+
+<h2>Add Track Listing Entry</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-grid">
+
+        <div class="form-row">
+            <label>Track ID</label>
+            {{ form.track_id }}
+        </div>
+
+        <div class="form-row">
+            <label>Show</label>
+            {{ form.show }}
+
+            {# Hidden field ensures the show value is POSTed even when disabled #}
+            {% if form.show.value %}
+                <input type="hidden" name="show" value="{{ form.show.value }}">
+            {% endif %}
+        </div>
+
+        <div class="form-row">
+    <label>Play Order</label>
+
+    {% if edit_mode %}
+        <input type="text" value="{{ form.play_order.value }}" readonly>
+        <input type="hidden" name="play_order" value="{{ form.play_order.value }}">
+    {% else %}
+        {{ form.play_order }}
+    {% endif %}
+</div>
+
+
+
+        <div class="form-row">
+            <label>Artist</label>
+            {{ form.artist }}
+        </div>
+
+        <div class="form-row">
+            <label>Title</label>
+            {{ form.title }}
+        </div>
+
+        <div class="form-row">
+            <label>Version</label>
+            {{ form.version }}
+        </div>
+
+        <div class="form-row">
+            <label>Notes</label>
+            {{ form.notes }}
+        </div>
+
+    </div>
+
+    <button type="submit">Save</button>
+</form>
+
+<style>
+.form-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 12px 20px;
+    max-width: 700px;
+}
+
+.form-row {
+    display: contents;
+}
+
+.form-grid label {
+    font-weight: bold;
+    align-self: center;
+}
+
+.form-grid input,
+.form-grid textarea,
+.form-grid select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+</style>
+
+<script>
+document.getElementById("editModeBtn").onclick = function() {
+    document.getElementById("editSelector").style.display = "block";
+};
+
+document.getElementById("trackSelect").onchange = function() {
+    const trackId = this.value;
+    if (trackId) {
+        window.location.href = "?edit=" + trackId;
+    }
+};
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+<script>
+$(function() {
+
+    // --- Artist autocomplete ---
+    $("#id_artist").autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: "{% url 'autocomplete_artist' %}",
+                data: { term: request.term },
+                success: function(data) {
+                    response(data);
+                }
+            });
+        },
+        minLength: 1
+    });
+
+    // --- Track autocomplete (filtered by artist) ---
+    $("#id_title").autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: "{% url 'autocomplete_track' %}",
+                data: {
+                    term: request.term,
+                    artist: $("#id_artist").val()
+                },
+                success: function(data) {
+                    response(data);
+                }
+            });
+        },
+        minLength: 1
+    });
+
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const showField = document.getElementById("id_show");
+    const playOrderField = document.getElementById("id_play_order");
+
+    function updatePlayOrder() {
+        const showId = showField.value;
+        if (!showId) return;
+
+        fetch(`/ajax/next-play-order/?show_id=${showId}`)
+            .then(response => response.json())
+            .then(data => {
+                playOrderField.value = data.next;
+            });
+    }
+
+    // Update when the user changes the Show dropdown
+    showField.addEventListener("change", updatePlayOrder);
+
+    // Update immediately when the page loads
+    updatePlayOrder();
+});
+</script>
+
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        const artistField = document.getElementById('id_artist');
+        if (artistField) {
+            artistField.focus();
+            artistField.select();  // optional: highlight existing text
+        }
+    });
+</script>
+
+
+{% endblock %}

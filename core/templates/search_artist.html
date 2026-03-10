@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Search Artist</h2>
+
+<form method="get" id="artist-form">
+    <input type="text" id="artist-input" name="artist" value="{{ query }}" autocomplete="off">
+    <button type="submit">Search</button>
+</form>
+
+<div id="artist-suggestions" class="suggestions"></div>
+
+
+{# ------------------------------ #}
+{#   MATCHING ARTISTS (optional)  #}
+{# ------------------------------ #}
+
+{% if artist_results %}
+<h3>Matching Artists</h3>
+<ul>
+    {% for artist in artist_results %}
+        <li>
+            <a href="#" onclick="selectArtist('{{ artist.name }}')">{{ artist.name }}</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+
+{# ------------------------------------------- #}
+{#   FULL TRACKLISTING RESULTS FOR THIS ARTIST #}
+{# ------------------------------------------- #}
+
+{% if tracklisting_results %}
+<h3>Tracks Played by {{ query }}</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Show Date</th>
+            <th>Show ID</th>
+            <th>Play Order</th>
+            <th>Title</th>
+            <th>Version</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for t in tracklisting_results %}
+        <tr>
+            <td>
+                {% if t.show_date %}
+                    {{ t.show_date|date:"d M Y" }}
+                {% else %}
+                    Unknown
+                {% endif %}
+            </td>
+            <td>{{ t.show_id }}</td>
+            <td>{{ t.play_order }}</td>
+            <td>{{ t.title }}</td>
+            <td>{{ t.version }}</td>
+            <td>{{ t.notes }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+
+{# ------------------------------------------- #}
+{#   DISTINCT TRACK SUMMARY + PLAY COUNT       #}
+{# ------------------------------------------- #}
+
+{% if track_summary %}
+<h2>Tracks by {{ query }}</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Track</th>
+            <th>Times Played</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for item in track_summary %}
+        <tr>
+            <td>
+                <a href="{% url 'track_detail' item.title %}">
+                    {{ item.title }}
+                </a>
+            </td>
+            <td>{{ item.play_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+
+<script>
+function selectArtist(name) {
+    document.getElementById("artist-input").value = name;
+    document.getElementById("artist-form").submit();
+}
+
+document.getElementById("artist-input").addEventListener("input", function () {
+    const term = this.value;
+    const box = document.getElementById("artist-suggestions");
+
+    if (term.length < 2) {
+        box.innerHTML = "";
+        return;
+    }
+
+    fetch(`/autocomplete/artist/?term=${term}`)
+        .then(response => response.json())
+        .then(data => {
+            box.innerHTML = "";
+            data.forEach(item => {
+                const div = document.createElement("div");
+                div.textContent = item;
+                div.onclick = () => {
+                    document.getElementById("artist-input").value = item;
+                    box.innerHTML = "";
+                    document.getElementById("artist-form").submit();
+                };
+                box.appendChild(div);
+            });
+        });
+});
+</script>
+
+{% endblock %}

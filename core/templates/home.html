@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="dashboard-grid">
+
+    <div class="column">
+
+
+<h1>Britpop Revival Show Database</h1>
+
+<div class="menu">
+    <a href="{% url 'add_show' %}" class="btn">Add New Show</a>
+    <a href="{% url 'add_tracklisting' %}" class="btn">Add Track Listing</a>
+    <a href="{% url 'search_artist' %}" class="btn">Search Artist</a>
+    <a href="{% url 'search_track' %}" class="btn">Search Track</a>
+    <a href="{% url 'stotw_list' %}" class="btn">Statto Tracks of the Week</a>
+	
+</div>
+
+
+        <h2>General Stats</h2>
+        <ul>
+            <li>Total Plays: {{ total_tracks }}</li>
+			<li>Total Distinct Tracks: {{ total_distinct_tracks }}</li>
+            <li>Total Artists: {{ total_artists }}</li>
+            <li>Total Shows: {{ total_shows }}</li>
+			{% if busiest_show %}
+			<li>
+				Most Plays in a Show:
+				{{ busiest_show.track_count }}
+				(Show {{ busiest_show.show_id }} — {{ busiest_show.show__show_date }})
+			</li>
+			{% endif %}
+
+        </ul>
+    </div>
+
+    <div class="column">
+
+        <h2>Top 10 Most Played Artists</h2>
+        <ol>
+            {% for item in top_artists %}
+                <li>{{ item.artist }} ({{ item.play_count }} plays)</li>
+            {% endfor %}
+        </ol>
+
+        <h2>Top 10 Most Played Tracks</h2>
+        <ol>
+            {% for item in top_tracks %}
+                <li>{{ item.artist }} – {{ item.title }} ({{ item.play_count }} plays)</li>
+            {% endfor %}
+        </ol>
+		
+		<h2>Top Artists by Number of Distinct Tracks</h2>
+		<ol>
+			{% for item in top_artists_by_distinct_tracks %}
+				<li>{{ item.artist }} – {{ item.distinct_track_count }} distinct tracks</li>
+			{% endfor %}
+		</ol>
+
+    </div>
+
+    <div class="column">
+
+        <h2>Top 10 Most Requested Artists</h2>
+        <ol>
+            {% for item in top_requested_artists %}
+                <li>{{ item.artist }} ({{ item.request_count }} requests)</li>
+            {% endfor %}
+        </ol>
+
+        <h2>Top 10 Most Requested Tracks</h2>
+        <ol>
+            {% for item in top_requested_tracks %}
+                <li>{{ item.artist }} – {{ item.title }} ({{ item.request_count }} requests)</li>
+            {% endfor %}
+        </ol>
+
+    </div>
+
+</div>
+
+<style>
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 300px;
+}
+.btn {
+    display: block;
+    padding: 12px;
+    background: #2c3e50;
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+.btn:hover {
+    background: #1a242f;
+}
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    align-items: start;
+    margin-top: 20px;
+}
+
+</style>
+
+{% endblock %}

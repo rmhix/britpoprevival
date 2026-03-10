@@ -1,0 +1,16 @@
+.suggestions {
+    border: 1px solid #ccc;
+    background: white;
+    position: absolute;
+    z-index: 1000;
+    width: 200px;
+}
+
+.suggestions div {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.suggestions div:hover {
+    background: #eee;
+}

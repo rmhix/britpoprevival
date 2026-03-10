@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<button type="button" id="editModeBtn">Edit Existing Show</button>
+
+<div id="editSelector" style="display:none; margin-top:10px;">
+    <label>Select Show to Edit:</label>
+    <select id="showSelect">
+        <option value="">-- choose a show --</option>
+        {% for show in shows %}
+            <option value="{{ show.show_id }}">{{ show.show_id }} — {{ show.show_date }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<h2>{% if edit_mode %}Edit Show{% else %}Add New Show{% endif %}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-grid">
+
+        <!-- SHOW ID -->
+        <div class="form-row">
+            <label>Show ID</label>
+
+            {% if edit_mode %}
+                <input type="text" value="{{ form.show_id.value }}" readonly>
+                <input type="hidden" name="show_id" value="{{ form.show_id.value }}">
+            {% else %}
+                {{ form.show_id }}
+            {% endif %}
+        </div>
+
+        <!-- SHOW DATE -->
+        <div class="form-row">
+            <label>Show Date</label>
+
+            {% if edit_mode %}
+                <input type="date" value="{{ form.show_date.value|date:'Y-m-d' }}" readonly>
+<input type="hidden" name="show_date" value="{{ form.show_date.value|date:'Y-m-d' }}">
+            {% else %}
+                {{ form.show_date }}
+            {% endif %}
+        </div>
+
+        <!-- ALBUM OF THE WEEK -->
+        <div class="form-row">
+            <label>Album of the Week</label>
+            {{ form.album_of_the_week }}
+        </div>
+
+        <!-- YEAR IN BRITPOP -->
+        <div class="form-row">
+            <label>Year in Britpop</label>
+            {{ form.year_in_britpop }}
+        </div>
+
+        <!-- NOTES -->
+        <div class="form-row">
+            <label>Notes</label>
+            {{ form.notes }}
+        </div>
+
+        <!-- SOTW STAT -->
+        <div class="form-row">
+            <label>SOTW Stat</label>
+            {{ form.sotw_stat }}
+        </div>
+
+    </div>
+
+    <button type="submit">Save</button>
+</form>
+
+<style>
+.form-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 12px 20px;
+    max-width: 700px;
+}
+
+.form-row {
+    display: contents;
+}
+
+.form-grid label {
+    font-weight: bold;
+    align-self: center;
+}
+
+.form-grid input,
+.form-grid textarea,
+.form-grid select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+</style>
+
+<script>
+document.getElementById("editModeBtn").onclick = function() {
+    document.getElementById("editSelector").style.display = "block";
+};
+
+document.getElementById("showSelect").onchange = function() {
+    const showId = this.value;
+    if (showId) {
+        window.location.href = "?edit=" + showId;
+    }
+};
+</script>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>STotW – Song of the Week Archive</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Show ID</th>
+            <th>Show Date</th>
+            <th>Play Order</th>
+            <th>Artist</th>
+            <th>Title</th>
+            <th>Version</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for t in tracks %}
+        <tr>
+            <td>{{ t.show.show_id }}</td>
+            <td>{{ t.show.show_date|date:"Y-m-d" }}</td>
+            <td>{{ t.play_order }}</td>
+            <td>{{ t.artist }}</td>
+            <td>{{ t.title }}</td>
+            <td>{{ t.version }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No STotW tracks found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
