@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+y)rd#_74u!zq9(y8e2llo%+8%uxivax$-u&v+exy-f-crqfl6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = false
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.railway.app']
 
 
 # Application definition
@@ -73,16 +73,14 @@ WSGI_APPLICATION = 'britpoprevival.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+import dj_database_url
+import os
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',  # replace with your actual database name
-        'USER': 'postgres',       # replace with your PostgreSQL username
-        'PASSWORD': 'xPqhg63sder01',   # replace with your PostgreSQL password
-        'HOST': 'localhost',             # or the server IP, if your database isn’t local
-        'PORT': '5432',             # the default PostgreSQL port
-    }
-}
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL')
+    )
+}it 
 
 
 # Password validation
