@@ -18,3 +18,7 @@ DATABASES = {
             },
     }
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://britpoprevival.onrender.com",
+]
