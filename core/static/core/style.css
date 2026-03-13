@@ -56,3 +56,14 @@
     background: #fff8d6;
     font-weight: 600;
 }
+
+.logout-link {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+}
