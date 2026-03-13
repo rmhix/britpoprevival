@@ -87,11 +87,11 @@ TEMPLATES = [
 # ---------------------------------------------------------
 # DATABASES (PostgreSQL for both local + Railway)
 # ---------------------------------------------------------
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DJANGO_DATABASE_URL")
 
 if not DATABASE_URL:
     raise ImproperlyConfigured(
-        "DATABASE_URL environment variable is not set. "
+        "DJANGO_DATABASE_URL environment variable is not set. "
         "Set your local PostgreSQL URL in your .env file."
     )
 
