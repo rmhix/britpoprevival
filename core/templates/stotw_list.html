@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load blankify %}
 {% block content %}
 
 <h2>STotW – Song of the Week Archive</h2>
 
-<table>
+<table class="track-summary-table">
     <thead>
         <tr>
             <th>Show ID</th>
@@ -23,7 +24,7 @@
             <td>{{ t.play_order }}</td>
             <td>{{ t.artist }}</td>
             <td>{{ t.title }}</td>
-            <td>{{ t.version }}</td>
+            <td>{{ t.version|blankify }}</td>
         </tr>
         {% empty %}
         <tr>

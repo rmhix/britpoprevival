@@ -23,9 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+y)rd#_74u!zq9(y8e2llo%+8%uxivax$-u&v+exy-f-crqfl6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['.railway.app']
+ALLOWED_HOSTS = ['.railway.app',
+                "127.0.0.1",
+                "localhost",
+]
 
 
 # Application definition
@@ -77,11 +80,20 @@ WSGI_APPLICATION = 'britpoprevival.wsgi.application'
 import dj_database_url
 import os
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise ImproperlyConfigured("DATABASE_URL environment variable is not set")
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL')
+    "default": dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=False,
     )
 }
+
+
  
 
 

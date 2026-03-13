@@ -8,8 +8,11 @@
 <body>
 
 <header class="site-header">
+{% if request.path != '/' %}
+    <a href="{% url 'home' %}">Home</a>
+{% endif %}
 
-    {% if request.resolver_match.url_name != "home" %}
+{% if request.resolver_match.url_name != "home" %}
     <a href="javascript:history.back()" class="back-btn">← Back</a>
 {% endif %}
 

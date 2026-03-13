@@ -1,14 +1,35 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
-
-
 from django.db import models
 
+
+# ============================================================
+#  NEW DJANGO-MANAGED MODELS (Artist + Track)
+# ============================================================
+
+class Artist(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Track(models.Model):
+    title = models.CharField(max_length=200)
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name="tracks")
+
+    class Meta:
+        ordering = ["title"]
+        unique_together = ("title", "artist")
+
+    def __str__(self):
+        return f"{self.title} — {self.artist.name}"
+
+
+# ============================================================
+#  LEGACY / AUTO-GENERATED TABLES (UNMANAGED)
+# ============================================================
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)
@@ -160,12 +181,20 @@ class ShowDetail(models.Model):
 class TrackListing(models.Model):
     track_id = models.IntegerField(db_column='Track_ID', primary_key=True)
 
-    # UPDATED: show_id is now a ForeignKey to ShowDetail
     show = models.ForeignKey(
         ShowDetail,
         on_delete=models.DO_NOTHING,
         db_column='Show_ID',
         related_name='tracks'
+    )
+
+    canonical_track = models.ForeignKey(
+        'Track',
+        on_delete=models.DO_NOTHING,
+        db_column='track_fk',
+        related_name='tracklist',
+        null=True,
+        blank=True
     )
 
     play_order = models.IntegerField(db_column='Play_Order', blank=True, null=True)
@@ -174,12 +203,12 @@ class TrackListing(models.Model):
     version = models.CharField(db_column='Version', max_length=255, blank=True, null=True)
     notes = models.CharField(db_column='Notes', max_length=5, blank=True, null=True)
 
+
     class Meta:
-        managed = False
+        managed = True
         db_table = 'tblTrackListing'
         verbose_name = "Track Listing"
         verbose_name_plural = "Track Listings"
 
     def __str__(self):
         return f"{self.play_order}. {self.artist} – {self.title}"
-

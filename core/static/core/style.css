@@ -14,3 +14,45 @@
 .suggestions div:hover {
     background: #eee;
 }
+
+.track-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+    background: #ffffff;
+    border: 1px solid #ddd;
+}
+
+.track-summary-table th,
+.track-summary-table td {
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.track-summary-table th {
+    background: #f7f7f7;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #ccc;
+}
+
+.track-summary-table tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.track-summary-table tr:hover {
+    background: #f0f7ff;
+    transition: background 0.2s ease-in-out;
+}
+
+.track-summary-table td.numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.track-summary-table .highlight {
+    background: #fff8d6;
+    font-weight: 600;
+}

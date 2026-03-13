@@ -10,12 +10,17 @@
 <h1>Britpop Revival Show Database</h1>
 
 <div class="menu">
-    <a href="{% url 'add_show' %}" class="btn">Add New Show</a>
+    <a href="{% url 'add_show' %}" class="btn">Add Show</a>
     <a href="{% url 'add_tracklisting' %}" class="btn">Add Track Listing</a>
     <a href="{% url 'search_artist' %}" class="btn">Search Artist</a>
     <a href="{% url 'search_track' %}" class="btn">Search Track</a>
     <a href="{% url 'stotw_list' %}" class="btn">Statto Tracks of the Week</a>
-	
+
+	<button id="copyTracklistBtn" class="btn">Copy Latest Show Tracks</button>
+	<div id="copyStatus" style="margin-top:8px; color:green; display:none;">
+		Copied!
+	</div>
+
 </div>
 
 
@@ -110,5 +115,19 @@
 }
 
 </style>
+
+<script>
+document.getElementById("copyTracklistBtn").addEventListener("click", function () {
+    fetch("/api/latest-tracklist/")
+        .then(response => response.json())
+        .then(data => {
+            navigator.clipboard.writeText(data.tracklist).then(() => {
+                const status = document.getElementById("copyStatus");
+                status.style.display = "block";
+                setTimeout(() => status.style.display = "none", 1500);
+            });
+        });
+});
+</script>
 
 {% endblock %}

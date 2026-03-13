@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import AnnualWinner, ShowDetail, TrackListing
-from core.models_new import Artist, Track
+from core.models import Artist, Track
 
 @admin.register(AnnualWinner)
 class AnnualWinnerAdmin(admin.ModelAdmin):

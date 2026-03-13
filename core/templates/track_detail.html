@@ -1,12 +1,30 @@
 {% extends "base.html" %}
-
+{% load blankify %}
 {% block content %}
 
-<h2>{{ title }}</h2>
+<h2>{{ track.title }}</h2>
+
+<p>
+    <strong>First played:</strong>
+    {% if first_played %}
+        {{ first_played|date:"d M Y" }}
+    {% else %}
+        Never played
+    {% endif %}
+    <br>
+
+    <strong>Last played:</strong>
+    {% if last_played %}
+        {{ last_played|date:"d M Y" }}
+    {% else %}
+        Never played
+    {% endif %}
+</p>
+
 <h3>Play History</h3>
 
 {% if plays %}
-<table>
+<table class="track-summary-table">
     <thead>
         <tr>
             <th>Show ID</th>

@@ -1,7 +1,8 @@
+{% extends "base.html" %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'your_app/style.css' %}">
+{% load blankify %}
 
-<a href="{% url 'home' %}" class="back-btn">← Back</a>
+{% block content %}
 
 <h2>Search Track</h2>
 
@@ -12,42 +13,77 @@
 
 <div id="track-suggestions" class="suggestions"></div>
 
+
+{# ------------------------------ #}
+{#   MATCHING TRACKS (autocomplete) #}
+{# ------------------------------ #}
+
 {% if track_results %}
 <h3>Matching Tracks</h3>
 <ul>
     {% for track in track_results %}
         <li>
             <a href="#" onclick="selectTrack('{{ track.title }}')">
-                {{ track.title }} — {{ track.artist.name }}
+                {{ track.title|blankify }} — {{ track.artist.name|blankify }}
             </a>
         </li>
     {% endfor %}
 </ul>
 {% endif %}
 
-{% if tracklisting_results %}
-<h3>All Plays of "{{ query }}"</h3>
 
-<table>
-    <tr>
-        <th>Show ID</th>
-        <th>Play Order</th>
-        <th>Artist</th>
-        <th>Version</th>
-        <th>Notes</th>
-    </tr>
+{# ------------------------------ #}
+{#   TRACK SUMMARY RESULTS        #}
+{# ------------------------------ #}
 
-    {% for t in tracklisting_results %}
-    <tr>
-        <td>{{ t.show_id }}</td>
-        <td>{{ t.play_order }}</td>
-        <td>{{ t.artist }}</td>
-        <td>{{ t.version }}</td>
-        <td>{{ t.notes }}</td>
-    </tr>
-    {% endfor %}
+{% if tracks %}
+<h3>Track Summary</h3>
+
+<table class="track-summary-table">
+    <thead>
+        <tr>
+            <th>Track</th>
+            <th>Artist</th>
+            <th>First Played</th>
+            <th>Last Played</th>
+            <th>Total Plays</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for t in tracks %}
+        <tr>
+            <td>
+                <a href="{% url 'track_detail' id=t.id %}">
+                    {{ t.title|blankify }}
+                </a>
+            </td>
+
+            <td>{{ t.artist.name|blankify }}</td>
+
+            <td>
+                {% if t.first_played %}
+                    {{ t.first_played|date:"d M Y" }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+
+            <td>
+                {% if t.last_played %}
+                    {{ t.last_played|date:"d M Y" }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+
+            <td>{{ t.play_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endif %}
+
 
 <script>
 function selectTrack(name) {
@@ -80,3 +116,5 @@ document.getElementById("track-input").addEventListener("input", function () {
         });
 });
 </script>
+
+{% endblock %}

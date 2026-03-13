@@ -1,13 +1,10 @@
-# Test comment for GIT
-
 from django import forms
 from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.forms import ModelForm
-from django.db.models import Q, Count, Max
-from .models import ShowDetail, TrackListing, AnnualWinner
+from django.db.models import Q, Count, Min, Max
+from .models import ShowDetail, TrackListing, AnnualWinner, Track, Artist
 from django.http import JsonResponse
-from .models_new import Artist, Track
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from .forms import TrackListingForm
@@ -122,47 +119,66 @@ class ShowDetailForm(ModelForm):
 @login_required
 def search_artist(request):
     query = request.GET.get("artist", "").strip()
-    results = []
+
+    artist_results = []
+    tracklisting_results = []
     track_summary = []
 
     if query:
-        # Main search results
-        results = TrackListing.objects.filter(artist__icontains=query)
+        # Matching artists (optional)
+        artist_results = Artist.objects.filter(name__icontains=query)
+
+        # Full tracklisting results
+        tracklisting_results = (
+        TrackListing.objects
+        .filter(canonical_track__artist__name__icontains=query)
+        .select_related("show", "canonical_track")
+)
 
         # Distinct tracks + play count
         track_summary = (
-            TrackListing.objects
-            .filter(artist__icontains=query)
-            .values("title")
-            .annotate(play_count=Count("title"))
-            .order_by("-play_count")
-        )
+        TrackListing.objects
+        .filter(canonical_track__artist__name__icontains=query)
+        .values("canonical_track_id", "canonical_track__title")
+        .annotate(play_count=Count("canonical_track_id"))
+        .order_by("-play_count")
+)
 
     return render(request, "search_artist.html", {
         "query": query,
-        "results": results,
+        "artist_results": artist_results,
+        "tracklisting_results": tracklisting_results,
         "track_summary": track_summary,
     })
 
 
 @login_required
 def search_track(request):
-    query = request.GET.get("track", "")
-    track_results = []
-    tracklisting_results = []
+    query = request.GET.get("track", "").strip()
 
-    # Autocomplete search results
+    track_results = []
+    tracks = []
+
     if query:
+        # Autocomplete-style list (unchanged)
         track_results = Track.objects.filter(title__icontains=query)
 
-        # If the query exactly matches a track title, fetch all matching rows
-        if Track.objects.filter(title=query).exists():
-            tracklisting_results = TrackListing.objects.filter(title=query).order_by("show_id", "play_order")
+        # Summary table: one row per track, matching Search Artist layout
+        tracks = (
+            Track.objects
+            .filter(title__icontains=query)
+            .annotate(
+                play_count=Count("tracklist"),
+                first_played=Min("tracklist__show__show_date"),
+                last_played=Max("tracklist__show__show_date"),
+            )
+            .order_by("title")
+        )
 
     return render(request, "search_track.html", {
         "query": query,
         "track_results": track_results,
-        "tracklisting_results": tracklisting_results,
+        "tracks": tracks,
     })
 
 
@@ -353,13 +369,28 @@ def add_show(request):
 
 
 @login_required
-def track_detail(request, title):
-    plays = TrackListing.objects.filter(title=title).order_by("-show_id")
+def track_detail(request, id):
+    track = Track.objects.get(id=id)
+
+    plays = TrackListing.objects.filter(
+        canonical_track=track
+    ).order_by("-show_id")
+
+    # First played / last played
+    stats = TrackListing.objects.filter(
+        canonical_track=track
+    ).aggregate(
+        first_played=Min("show__show_date"),
+        last_played=Max("show__show_date")
+    )
 
     return render(request, "track_detail.html", {
-        "title": title,
+        "track": track,
         "plays": plays,
+        "first_played": stats["first_played"],
+        "last_played": stats["last_played"],
     })
+
 
 
 @login_required
@@ -392,3 +423,20 @@ def stotw_list(request):
     return render(request, "stotw_list.html", {
         "tracks": stotw_tracks
     })
+
+
+@login_required   
+def latest_tracklist(request):
+    latest_show = ShowDetail.objects.order_by('-show_date').first()
+
+    if not latest_show:
+        return JsonResponse({'tracklist': 'No shows found'})
+
+    tracks = TrackListing.objects.filter(show=latest_show).order_by('play_order')
+
+    text = "\n".join(
+        f"{t.play_order}. {t.artist} – {t.title}"
+        for t in tracks
+    )
+
+    return JsonResponse({'tracklist': text})
