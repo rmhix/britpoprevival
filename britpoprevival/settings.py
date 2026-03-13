@@ -23,7 +23,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-not-for-production")
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
-    ".railway.app",
+    ".onrender.com",
     "127.0.0.1",
     "localhost",
 ]
@@ -85,11 +85,9 @@ TEMPLATES = [
 
 
 # ---------------------------------------------------------
-# DATABASES (PostgreSQL for both local + Railway)
+# DATABASES (PostgreSQL for both local + Render)
 # ---------------------------------------------------------
 DATABASE_URL = os.getenv("DJANGO_DATABASE_URL")
-
-print("ENV VARS:", list(os.environ.keys()))
 
 if not DATABASE_URL:
     raise ImproperlyConfigured(
@@ -101,7 +99,7 @@ DATABASES = {
     "default": dj_database_url.config(
         default=DATABASE_URL,
         conn_max_age=600,
-        ssl_require=False,
+        ssl_require=True,
     )
 }
 
