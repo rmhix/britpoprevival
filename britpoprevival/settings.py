@@ -4,30 +4,25 @@ Django settings for britpoprevival project.
 
 from pathlib import Path
 import os
-import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
-from dotenv import load_dotenv
-load_dotenv()
 
 # ---------------------------------------------------------
 # BASE DIRECTORY
 # ---------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # ---------------------------------------------------------
 # SECURITY
 # ---------------------------------------------------------
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-not-for-production")
-
-DEBUG = os.getenv("DEBUG", "False") == "True"
+# These will be overridden in settings_local.py and settings_prod.py
+SECRET_KEY = "dev-secret-key"
+DEBUG = True
 
 ALLOWED_HOSTS = [
     ".onrender.com",
     "127.0.0.1",
     "localhost",
 ]
-
 
 # ---------------------------------------------------------
 # APPLICATIONS
@@ -41,7 +36,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "core",
 ]
-
 
 # ---------------------------------------------------------
 # MIDDLEWARE
@@ -57,13 +51,11 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
 # ---------------------------------------------------------
 # URLS & WSGI
 # ---------------------------------------------------------
 ROOT_URLCONF = "britpoprevival.urls"
 WSGI_APPLICATION = "britpoprevival.wsgi.application"
-
 
 # ---------------------------------------------------------
 # TEMPLATES
@@ -83,26 +75,11 @@ TEMPLATES = [
     },
 ]
 
-
 # ---------------------------------------------------------
-# DATABASES (PostgreSQL for both local + Render)
+# DATABASES
 # ---------------------------------------------------------
-DATABASE_URL = os.getenv("DJANGO_DATABASE_URL")
-
-if not DATABASE_URL:
-    raise ImproperlyConfigured(
-        "DJANGO_DATABASE_URL environment variable is not set. "
-        "Set your local PostgreSQL URL in your .env file."
-    )
-
-DATABASES = {
-    "default": dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        ssl_require=True,
-    )
-}
-
+# This will be overridden in settings_local.py or settings_prod.py
+DATABASES = {}
 
 # ---------------------------------------------------------
 # PASSWORD VALIDATION
@@ -114,7 +91,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-
 # ---------------------------------------------------------
 # INTERNATIONALIZATION
 # ---------------------------------------------------------
@@ -123,7 +99,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-
 # ---------------------------------------------------------
 # STATIC FILES
 # ---------------------------------------------------------
@@ -131,7 +106,6 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
 
 # ---------------------------------------------------------
 # DEFAULT PRIMARY KEY FIELD TYPE
