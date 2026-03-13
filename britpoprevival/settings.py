@@ -89,6 +89,8 @@ TEMPLATES = [
 # ---------------------------------------------------------
 DATABASE_URL = os.getenv("DJANGO_DATABASE_URL")
 
+print("ENV VARS:", list(os.environ.keys()))
+
 if not DATABASE_URL:
     raise ImproperlyConfigured(
         "DJANGO_DATABASE_URL environment variable is not set. "
