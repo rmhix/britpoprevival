@@ -440,7 +440,9 @@ def latest_tracklist(request):
     )
 
     return JsonResponse({'tracklist': text})
-    
+
+
+# delete all of this after backfill is sorted #
     
 from django.http import HttpResponse
 from core.models import TrackListing, Artist, Track
@@ -468,3 +470,10 @@ def backfill_canonical(request):
             count += 1
 
     return HttpResponse(f"Backfill complete. Updated {count} rows.")
+    
+    
+from django.http import HttpResponse
+from django.conf import settings
+
+def debug_root(request):
+    return HttpResponse(f"ROOT_URLCONF = {settings.ROOT_URLCONF}")

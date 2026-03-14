@@ -18,5 +18,6 @@ urlpatterns = [
     path("stotw/", views.stotw_list, name="stotw_list"),
     path("api/latest-tracklist/", views.latest_tracklist, name="latest_tracklist"),
     path("backfill/", backfill_canonical),
+    path("debug-root/", debug_root),
 
 ]
