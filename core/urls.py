@@ -1,7 +1,8 @@
 from django.urls import path
 from . import views
 from core.health import health
-from .views import backfill_canonical
+from .views import backfill_canonical, debug_root
+
 
 urlpatterns = [
     path("health/", health),
