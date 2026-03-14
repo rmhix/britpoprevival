@@ -457,6 +457,9 @@ def backfill_canonical(request):
         artist_name = tl.artist.strip()
         track_title = tl.title.strip()
 
+        # DEBUG LOGGING — helps identify the bad artist name
+        print(f"Processing artist_name={artist_name!r}")
+
         artist_obj, _ = Artist.objects.get_or_create(name=artist_name)
 
         track_obj, _ = Track.objects.get_or_create(
