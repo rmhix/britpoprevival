@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from core.health import health
+from .views import backfill_canonical
 
 urlpatterns = [
     path("health/", health),
@@ -16,5 +17,6 @@ urlpatterns = [
     path("ajax/next-play-order/", views.next_play_order, name="next_play_order"),
     path("stotw/", views.stotw_list, name="stotw_list"),
     path("api/latest-tracklist/", views.latest_tracklist, name="latest_tracklist"),
+    path("backfill/", backfill_canonical),
 
 ]

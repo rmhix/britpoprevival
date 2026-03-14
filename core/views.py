@@ -440,3 +440,31 @@ def latest_tracklist(request):
     )
 
     return JsonResponse({'tracklist': text})
+    
+    
+from django.http import HttpResponse
+from core.models import TrackListing, Artist, Track
+
+def backfill_canonical(request):
+    count = 0
+
+    for tl in TrackListing.objects.all():
+        if not tl.artist or not tl.title:
+            continue
+
+        artist_name = tl.artist.strip()
+        track_title = tl.title.strip()
+
+        artist_obj, _ = Artist.objects.get_or_create(name=artist_name)
+
+        track_obj, _ = Track.objects.get_or_create(
+            title=track_title,
+            artist=artist_obj
+        )
+
+        if tl.canonical_track is None:
+            tl.canonical_track = track_obj
+            tl.save(update_fields=["canonical_track"])
+            count += 1
+
+    return HttpResponse(f"Backfill complete. Updated {count} rows.")
